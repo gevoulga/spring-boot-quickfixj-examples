@@ -3,10 +3,213 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <url>https://github.com/gevoulga/spring-boot-quickfixj-examples</url>
+    <organization>
+        <name>ch.voulgarakis</name>
+        <url>https://voulgarakis.ch</url>
+    </organization>
+    <issueManagement>
+        <system>GitHub</system>
+        <url>https://github.com/gevoulga/spring-boot-quickfixj-examples/issues</url>
+    </issueManagement>
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url>https://github.com/gevoulga/spring-boot-quickfixj-examples/blob/main/LICENSE</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+    <scm>
+        <url>https://github.com/gevoulga/spring-boot-quickfixj-examples</url>
+        <connection>scm:git:https://github.com/gevoulga/spring-boot-quickfixj-examples.git</connection>
+        <developerConnection>scm:git:ssh://git@github.com:gevoulga/spring-boot-quickfixj-examples.git
+        </developerConnection>
+    </scm>
+    <developers>
+        <developer>
+            <name>Georgios Voulgarakis</name>
+            <email>mail@voulgarakis.ch</email>
+        </developer>
+    </developers>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.3.5.RELEASE</version>
+        <relativePath/>
+    </parent>
 
     <groupId>ch.voulgarakis</groupId>
     <artifactId>spring-boot-quickfixj-examples</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <version>${revision}${changelist}</version>
+    <description>A collection of Spring Boot QuickFixJ examples</description>
+    <packaging>pom</packaging>
 
+    <modules>
+        <module>voulgarakis-commons</module>
+        <module>fix-server-example</module>
+        <module>fix-client-example</module>
+    </modules>
+
+    <properties>
+        <revision>1.0.0</revision>
+        <changelist>-SNAPSHOT</changelist>
+
+        <!-- project -->
+        <java.version>1.8</java.version>
+        <maven.javadoc.skip>false</maven.javadoc.skip>
+
+        <!--//////////////-->
+        <!-- Dependencies -->
+        <!--//////////////-->
+        <quickfixj-spring-boot.version>1.0.0-SNAPSHOT</quickfixj-spring-boot.version>
+
+        <!--/////////-->
+        <!-- Plugins -->
+        <!--/////////-->
+        <dockerfile-maven-plugin.version>1.4.13</dockerfile-maven-plugin.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!--Modules-->
+            <dependency>
+                <groupId>ch.voulgarakis</groupId>
+                <artifactId>quickfixj-spring-boot-starter-flux</artifactId>
+                <version>${quickfixj-spring-boot.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.voulgarakis</groupId>
+                <artifactId>quickfixj-spring-boot-actuator</artifactId>
+                <version>${quickfixj-spring-boot.version}</version>
+            </dependency>
+
+            <!-- Test dependencies -->
+            <dependency>
+                <groupId>ch.voulgarakis</groupId>
+                <artifactId>quickfixj-spring-boot-starter</artifactId>
+                <version>${quickfixj-spring-boot.version}</version>
+                <type>test-jar</type>
+            </dependency>
+            <dependency>
+                <groupId>ch.voulgarakis</groupId>
+                <artifactId>quickfixj-spring-boot-starter-flux</artifactId>
+                <version>${quickfixj-spring-boot.version}</version>
+                <type>test-jar</type>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <plugins>
+            <!-- pom flatterer needed for CI -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <configuration>
+                    <updatePomFile>true</updatePomFile>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>flatten.clean</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>flatten.process-resources</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Build the test-jars of all dpne modules -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-tests</id>
+                        <goals>
+                            <goal>test-jar</goal>
+                            <goal>help</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Attach source code -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-source-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>attach-sources</id>
+                        <goals>
+                            <goal>jar</goal>
+                            <goal>test-jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <!-- Build the javadoc -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <configuration>
+                    <doclint>none</doclint>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>attach-javadocs</id>
+                        <goals>
+                            <goal>jar</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+        <pluginManagement>
+            <plugins>
+                <!-- We can create a docker build, tag and push the images -->
+                <plugin>
+                    <groupId>com.spotify</groupId>
+                    <artifactId>dockerfile-maven-plugin</artifactId>
+                    <version>${dockerfile-maven-plugin.version}</version>
+                    <executions>
+                        <execution>
+                            <id>tag-latest</id>
+                            <goals>
+                                <goal>build</goal>
+                                <goal>tag</goal>
+                                <goal>push</goal>
+                            </goals>
+                            <configuration>
+                                <tag>latest</tag>
+                            </configuration>
+                        </execution>
+                        <execution>
+                            <id>tag-version</id>
+                            <goals>
+                                <goal>build</goal>
+                                <goal>tag</goal>
+                                <goal>push</goal>
+                            </goals>
+                            <configuration>
+                                <tag>${project.version}</tag>
+                            </configuration>
+                        </execution>
+                    </executions>
+                    <configuration>
+                        <useMavenSettingsForAuth>true</useMavenSettingsForAuth>
+                        <repository>registry.hub.docker.com/[username]/${project.artifactId}</repository>
+                        <tag>${project.version}</tag>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 
 </project>
