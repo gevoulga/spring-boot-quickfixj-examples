@@ -35,7 +35,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.UUID;
 
-//@DependsOn("reactiveFixSessions")
 @RestController
 @RequestMapping("/fix")
 public class WebEndpoints {
@@ -48,12 +47,6 @@ public class WebEndpoints {
     //@Qualifier("TEST")
     private final ReactiveFixSession fixSession;
 
-    @Autowired
-    public WebEndpoints(ReactiveFixSession fixSession) {
-//        reactiveFixSessions.getFixSessions();
-        this.fixSession = fixSession;
-    }
-
     /**
      * Or we could wire-in the {@link ReactiveFixSessions} which is registry of all the sessions.
      * Then, we could get the {@link ReactiveFixSession} by calling any of:
@@ -62,6 +55,12 @@ public class WebEndpoints {
      * {@link ReactiveFixSessions#get(String)}
      */
     //private final ReactiveFixSessions reactiveFixSessions;
+
+    @Autowired
+    public WebEndpoints(ReactiveFixSession fixSession) {
+        this.fixSession = fixSession;
+    }
+
     @GetMapping("quote")
     @ResponseStatus(HttpStatus.OK)
     public Flux<String> quoteFromFixServer() {
