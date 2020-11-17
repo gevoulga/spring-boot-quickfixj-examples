@@ -67,8 +67,7 @@
         </dependency>
         <dependency>
             <groupId>ch.voulgarakis</groupId>
-            <artifactId>quickfixj-spring-boot-starter-flux</artifactId>
-            <type>test-jar</type>
+            <artifactId>quickfixj-spring-boot-test</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

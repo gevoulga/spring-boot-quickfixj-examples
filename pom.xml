@@ -61,7 +61,7 @@
         <!--//////////////-->
         <!-- Dependencies -->
         <!--//////////////-->
-        <quickfixj-spring-boot.version>1.0.0-SNAPSHOT</quickfixj-spring-boot.version>
+        <quickfixj-spring-boot.version>1.0.2.RELEASE</quickfixj-spring-boot.version>
 
         <!--/////////-->
         <!-- Plugins -->
@@ -86,15 +86,8 @@
             <!-- Test dependencies -->
             <dependency>
                 <groupId>ch.voulgarakis</groupId>
-                <artifactId>quickfixj-spring-boot-starter</artifactId>
+                <artifactId>quickfixj-spring-boot-test</artifactId>
                 <version>${quickfixj-spring-boot.version}</version>
-                <type>test-jar</type>
-            </dependency>
-            <dependency>
-                <groupId>ch.voulgarakis</groupId>
-                <artifactId>quickfixj-spring-boot-starter-flux</artifactId>
-                <version>${quickfixj-spring-boot.version}</version>
-                <type>test-jar</type>
             </dependency>
 
         </dependencies>
