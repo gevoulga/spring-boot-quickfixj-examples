@@ -1,18 +1,8 @@
-FROM maven:3.6.0-jdk-8-alpine AS MAVEN_TOOL_CHAIN
-#Copy over the project files and run maven package
-WORKDIR /tmp
-COPY pom.xml /tmp/
-COPY src /tmp/src/
-RUN mvn package
-
-#########################
-
 FROM openjdk:8-jdk-alpine as layerbuilder
+ARG JAR_FILE=target/*-executable.jar
 WORKDIR /user/app
 #Copy over the fat-jar file into the /user/app directory
-COPY --from=MAVEN_TOOL_CHAIN /tmp/target/*-executable.jar app.jar
-#ARG JAR_FILE=target/*-executable.jar
-#COPY ${JAR_FILE} app.jar
+COPY ${JAR_FILE} app.jar
 #And extract the layers
 RUN java -Djarmode=layertools -jar app.jar extract
 
@@ -27,15 +17,12 @@ COPY --from=layerbuilder /user/app/snapshot-dependencies/ ./
 COPY --from=layerbuilder /user/app/spring-boot-loader/ ./
 #Allow debuggin
 ENV JAVA_TOOL_OPTIONS -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005
-#Expose the ports for REST and DEBUG
-EXPOSE 8080
+#Expose the ports for FIX and DEBUG
+EXPOSE 9091
 EXPOSE 5005
 #Labels
-LABEL component="FIX-CLIENT"
-#LABEL artifact="FIX-CLIENT"
-#LABEL version="FIX-CLIENT"
+LABEL component="FIX-SERVER"
+#LABEL artifact="FIX-SERVER"
+#LABEL version="FIX-SERVER"
 #the application entry point
 ENTRYPOINT ["java","org.springframework.boot.loader.JarLauncher"]
-
-#Health check by pinging the actuator health url
-HEALTHCHECK  --start-period=20s CMD wget --quiet --tries=1 --spider http://localhost:8080/actuator/health || exit 1
